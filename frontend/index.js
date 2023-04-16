@@ -4,7 +4,7 @@ const	match = document.querySelector ("#match");
 const	form = document.querySelector ("#form");
 const	label = document.querySelector ("label");
 const	socket = io ('http://localhost:1337');
-let		socketId = '';
+var		socketId = '';
 
 function setCookie(name, value, days) {
     let expires = "";

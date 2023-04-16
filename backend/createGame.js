@@ -36,7 +36,6 @@ function	getBall(width, height, speed) {
 		maxX: speed, // max speed X from 10 to 50
 		maxY: speed * 1.5, // max speed Y from 10 to 50
 		color: `white`,
-		stop: false
 	};
 	if (Math.random() > 0.5)
 		ball.velocityX = 5;

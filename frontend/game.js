@@ -3,7 +3,9 @@ const	play = document.querySelector ('#play');
 const	canvas = document.getElementById('pong');
 const	ctx = canvas.getContext('2d');
 const	playerName = getCookie ('name');
+const	socket = io ('http://localhost:3000');
 const	FPS = 60;
+var		socketId = '';
 var		ball;
 var		fplayer;
 var		splayer;
@@ -145,10 +147,16 @@ async function	checkGame() {
 	splayer.name = sh4.textContent;
 }
 
+async function	update() {
+	if (fplayer.name === playerName || splayer.name === playerName) {
+		socket.emit (`update`, JSON.stringify ([ball, fplayer, splayer, {width: canvas.width, height: canvas.height, speed: 30}]));
+	}
+}
+
 async	function startGame() {
 	await checkGame ();
-	await draw2d ();
 	setInterval (draw2d, 1000 / FPS);
+	setInterval (update, 10);
 }
 
 canvas.addEventListener("mousemove", (event) => {
@@ -170,6 +178,13 @@ canvas.addEventListener("mousemove", (event) => {
 		else if (splayer.y > canvas.height - splayer.height)
 			splayer.y = canvas.height - splayer.height - 2;
 	}
+});
+
+socket.on ('newPosition', (data) => {
+	data = JSON.parse (data);
+	ball = data[0];
+	fplayer = data[1];
+	splayer = data[2];
 });
 
 startGame ();

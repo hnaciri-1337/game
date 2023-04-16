@@ -1,8 +1,11 @@
 const   express = require ('express');
 const	app = express();
-const	server = require('http').createServer(app);
-const	io = require ('socket.io')(server, { cors: { origin: "*" }});
+const	server1 = require('http').createServer(app);
+const	server2 = require('http').createServer(app);
+const	io1 = require ('socket.io')(server1, { cors: { origin: "*" }});
+const	io2 = require ('socket.io')(server2, { cors: { origin: "*" }});
 const	db = require ('./queries');
+const	cg = require ('./calculeGame');
 let		playerQueue = [];
 
 app.use((req, res, next) => {
@@ -31,8 +34,8 @@ function	matchPlayer() {
   		const	splayer = playerQueue.shift();
 		const	id = makeId (20);
 		let		url = `./game.html?gameId=${id}`;
-		const	fplayerSocket = io.sockets.sockets.get(fplayer.id);
-		const	splayerSocket = io.sockets.sockets.get(splayer.id);
+		const	fplayerSocket = io1.sockets.sockets.get(fplayer.id);
+		const	splayerSocket = io1.sockets.sockets.get(splayer.id);
 		if (db.addGame (id, fplayer.name, splayer.name) == false)
 			return ;
 		fplayerSocket.emit (`startGame`, url);
@@ -52,16 +55,28 @@ app.post('/joinQueue', (req, res) => {
 app.get('/createGame/:width/:height/:speed', db.createGame);
 app.get('/findGame/:id', db.getGameInfo);
 
-server.listen (1337, () => {
-	console.log ('Server listening on port 1337');
+server1.listen (1337, () => {
+	console.log ('Server1 listening on port 1337');
 });
 
-io.on('connection', (socket) => {
-	socket
+server2.listen (3000, () => {
+	console.log ('Server2 listening on port 3000');
+});
+
+io1.on('connection', (socket) => {
 	socket.on('disconnect', () => {
 		playerQueue = playerQueue.filter ((v, i, a) => {
 			return v.id != socket.id;
 		});
+	});
+});
+
+io2.on('connection', (socket) => {
+	socket.on ('update', (data) => {
+		data = JSON.parse (data);
+		cg.Update (data[0], data[1], data[2], data[3]);
+		socket.broadcast.emit ('newPosition', JSON.stringify (data));
+		socket.emit ('newPosition', JSON.stringify (data));
 	});
 });
 
