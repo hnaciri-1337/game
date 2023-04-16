@@ -4,16 +4,16 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" href="style.css">
+	<link rel="stylesheet" href="game.css">
     <title></title>
 </head>
 <body>
-    <div id="second">
-		<center>
-			<div className="game-container">
-				<canvas id="pong" width="1920" height="1280"></canvas>
-			</div>
-		</center>
+    <div id="container">
+		<div id="players">
+		</div>
+		<div id="game-container">
+			<canvas id="pong" width="1920" height="1280"></canvas>
+		</div>
 	</div>
 	<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 	<script src="game.js"></script>

@@ -2,7 +2,7 @@ const   express = require ('express');
 const	app = express();
 const	server = require('http').createServer(app);
 const	io = require ('socket.io')(server, { cors: { origin: "*" }});
-const	cg = require ('./createGame');
+const	db = require ('./queries');
 let		playerQueue = [];
 
 app.use((req, res, next) => {
@@ -16,31 +16,27 @@ app.use (express.json());
 app.use (express.urlencoded({extended: true}));
 app.use (express.text());
 
-function	createGame () {
-	return [cg.getBall (), cg.getFirstPlayer (), cg.getSecondPlayer ()];
+function makeId(length) {
+    let result = '';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+    const charactersLength = characters.length;
+    while (length--)
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    return result;
 }
 
 function	matchPlayer() {
-	console.log (playerQueue);
 	while (playerQueue.length >= 2) {
-		console.log (playerQueue);
 		const	fplayer = playerQueue.shift();
   		const	splayer = playerQueue.shift();
-		let		data = {
-			url: `./game.html`,
-			firstPlayer: cg.getFirstPlayer(),
-			secondPlayer: cg.getSecondPlayer(),
-			ball: cg.getBall(),
-		}
-		data.firstPlayer.name = fplayer.name;
-		data.firstPlayer.id = fplayer.id;
-		data.secondPlayer.name = splayer.name;
-		data.secondPlayer.id = splayer.id;
-		console.log (io.sockets.sockets.get(fplayer.id));
+		const	id = makeId (20);
+		let		url = `./game.html?gameId=${id}`;
 		const	fplayerSocket = io.sockets.sockets.get(fplayer.id);
 		const	splayerSocket = io.sockets.sockets.get(splayer.id);
-		fplayerSocket.emit (`startGame`, data);
-		splayerSocket.emit (`startGame`, data);
+		if (db.addGame (id, fplayer.name, splayer.name) == false)
+			return ;
+		fplayerSocket.emit (`startGame`, url);
+		splayerSocket.emit (`startGame`, url);
 	}
 }
 
@@ -50,9 +46,11 @@ app.post('/joinQueue', (req, res) => {
 		id: req.body.id,
 	};
 	playerQueue.push(player);
-	console.log (playerQueue);
 	res.status(201).send({ message: 'Joined queue successfully' });
 });
+
+app.get('/createGame/:width/:height/:speed', db.createGame);
+app.get('/findGame/:id', db.getGameInfo);
 
 server.listen (1337, () => {
 	console.log ('Server listening on port 1337');

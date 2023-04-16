@@ -1,11 +1,6 @@
-const	obj = require ('./index');
-
-function	getFirstPlayer() {
-	const	width = 1920;
-	const	height = 1280;
+function	getFirstPlayer(width, height) {
 	const	player = {
 		name: '',
-		id: '',
 		width: width - ((99 * width) / 100),
 		height: height - ((80 * height) / 100),
 		x: 2,
@@ -16,12 +11,9 @@ function	getFirstPlayer() {
 	return player;
 }
 
-function	getSecondPlayer() {
-	const	width = 1920;
-	const	height = 1280;
+function	getSecondPlayer(width, height) {
 	const	player = {
 		name: '',
-		id: '',
 		width: width - ((99 * width) / 100),
 		height: height - ((80 * height) / 100),
 		x: width - ((1 * width) / 100) - 2,
@@ -32,10 +24,7 @@ function	getSecondPlayer() {
 	return player;
 }
 
-function	getBall() {
-	const	width = 1920;
-	const	height = 1280;
-	const	maxSpeed = 30;
+function	getBall(width, height, speed) {
 	const ball = {
 		x: width / 2,
 		y: height / 2,
@@ -44,8 +33,8 @@ function	getBall() {
 		speedY: 20, // 1 to 100
 		velocityX: 0,
 		velocityY: 0,
-		maxX: maxSpeed, // max speed X from 10 to 50
-		maxY: maxSpeed * 1.5, // max speed Y from 10 to 50
+		maxX: speed, // max speed X from 10 to 50
+		maxY: speed * 1.5, // max speed Y from 10 to 50
 		color: `white`,
 		stop: false
 	};

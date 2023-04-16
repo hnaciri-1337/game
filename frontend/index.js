@@ -85,6 +85,6 @@ socket.on ('connect', () => {
 	socketId = socket.id;
 });
 
-socket.on ('startGame', (data) => {
-	document.location = data.url;
+socket.on ('startGame', (url) => {
+	document.location = url;
 });
